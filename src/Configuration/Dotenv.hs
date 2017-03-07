@@ -1,86 +1,66 @@
 -- |
 -- Module      :  Configuration.Dotenv
--- Copyright   :  © 2015–2016 Stack Builders Inc.
+-- Copyright   :  © 2015–2017 Stack Builders Inc.
 -- License     :  MIT
 --
 -- Maintainer  :  Stack Builders <hackage@stackbuilders.com>
 -- Stability   :  experimental
 -- Portability :  portable
 --
--- This module contains common functions to load and read dotenv files.
+-- Provides the ability to load a dotenv file with an specific configuration.
 
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE CPP             #-}
+{-# LANGUAGE RecordWildCards #-}
 
 module Configuration.Dotenv
-  ( load
-  , loadFile
-  , parseFile
-  , onMissingFile )
- where
+  ( loadFile
+  ) where
 
-import Configuration.Dotenv.Parse (configParser)
-import Control.Monad.Catch
-import Control.Monad.IO.Class (MonadIO(..))
-import System.Environment (lookupEnv)
-import System.IO.Error (isDoesNotExistError)
-import Text.Megaparsec (parse)
+import Control.Monad (liftM)
+import Control.Monad.IO.Class
 
 #if MIN_VERSION_base(4,7,0)
-import System.Environment (setEnv)
+import System.Environment (getEnv, setEnv, lookupEnv)
 #else
-import System.Environment.Compat (setEnv)
+import System.Environment.Compat (getEnv, setEnv, lookupEnv)
 #endif
 
--- | Loads the given list of options into the environment. Optionally
--- override existing variables with values from Dotenv files.
-load ::
-  MonadIO m =>
-  Bool -- ^ Override existing settings?
-  -> [(String, String)] -- ^ List of values to be set in environment
-  -> m ()
-load override = mapM_ (applySetting override)
+import Configuration.Dotenv.File
+import Configuration.Dotenv.Types
 
--- | Loads the options in the given file to the environment. Optionally
--- override existing variables with values from Dotenv files.
-loadFile ::
-  MonadIO m =>
-  Bool        -- ^ Override existing settings?
-  -> FilePath -- ^ A file containing options to load into the environment
-  -> m ()
-loadFile override f = load override =<< parseFile f
+-- | @loadFile@ parses the given dotenv file and checks if the environment are empty or not.
+loadFile :: MonadIO m => Config -> m [Variable]
+loadFile Config{..} = do
+  keys      <- map fst `liftM` parseFile configExamplePath
+  maybeVars <- parseMaybeFile configPath
+  setupEnvVars configOverride keys maybeVars
 
--- | Parses the given dotenv file and returns values /without/ adding them to
--- the environment.
-parseFile ::
-  MonadIO m =>
-  FilePath -- ^ A file containing options to read
-  -> m [(String, String)] -- ^ Variables contained in the file
-parseFile f = do
-  contents <- liftIO $ readFile f
+setupEnvVars :: MonadIO m => Bool -> [String] -> Maybe [Variable] -> m [Variable]
+setupEnvVars override keys maybeVars =
+  case maybeVars of
+    Nothing   -> mapM getEnvVariable keys
+    Just vars -> setVariables override keys vars
 
-  case parse configParser f contents of
-    Left e        -> error $ "Failed to read file" ++ show e
-    Right options -> return options
+getEnvVariable :: MonadIO m => String -> m Variable
+getEnvVariable key =
+  liftM ((,) key) (liftIO (getEnv key))
 
-applySetting :: MonadIO m => Bool -> (String, String) -> m ()
-applySetting override (key, value) =
+setVariables :: MonadIO m => Bool -> [String] -> [Variable] -> m [Variable]
+setVariables override keys vars =
+  mapM (getVariable vars) keys >>= mapM (setVariable override)
+
+getVariable :: MonadIO m => [Variable] -> String -> m Variable
+getVariable vars key =
+  case lookup key vars of
+    Nothing  -> getEnvVariable key
+    Just var -> return (key, var)
+
+setVariable :: MonadIO m => Bool -> Variable -> m Variable
+setVariable override var@(key, value) =
   if override then
-    liftIO $ setEnv key value
-
+    liftIO $ setEnv key value >> return var
   else do
     res <- liftIO $ lookupEnv key
-
     case res of
-      Nothing -> liftIO $ setEnv key value
-      Just _  -> return ()
-
--- | The helper allows to avoid exceptions in the case of missing files and
--- perform some action instead.
---
--- @since 0.3.1.0
-
-onMissingFile :: MonadCatch m
-  => m a -- ^ Action to perform that may fail because of missing file
-  -> m a               -- ^ Action to perform if file is indeed missing
-  -> m a
-onMissingFile f h = catchIf isDoesNotExistError f (const h)
+      Nothing   -> liftIO $ setEnv key value >> return var
+      Just val' -> return (key, val')

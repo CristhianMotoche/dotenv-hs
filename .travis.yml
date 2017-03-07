@@ -33,7 +33,7 @@ script:
  - cabal test --show-details=always
  - cabal sdist
  - if [ "$GHCVER" != "7.6.3" ]; then
-    cabal haddock | grep "100%" | wc -l | grep "3";
+    cabal haddock | grep "100%" | wc -l | grep "5";
    fi
 
 notifications:

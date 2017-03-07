@@ -1,4 +1,5 @@
 {-# LANGUAGE CPP #-}
+{-# LANGUAGE RecordWildCards #-}
 
 module Main where
 
@@ -8,18 +9,31 @@ import Data.Monoid ((<>))
 
 import Options.Applicative
 
-import Configuration.Dotenv (loadFile)
-
+import Control.Monad (void)
 import Control.Monad.IO.Class(MonadIO(..))
 
+import System.FilePath ((</>))
+import System.Directory (getCurrentDirectory)
 import System.Process (system)
 import System.Exit (exitWith)
 
+import Configuration.Dotenv
+import Configuration.Dotenv.Types
+
 data Options = Options
-  { files    :: [String]
-  , program  :: String
-  , overload :: Bool
+  { program           :: String -- ^ Program to run with the load env variables
+  , dotenvFile        :: String -- ^ Path for the .env file
+  , dotenvExampleFile :: String -- ^ Path for the .env.example file
+  , override          :: Bool   -- ^ Override current environment variables
   } deriving (Show)
+
+buildConfig :: FilePath -> FilePath -> Config
+buildConfig dotenvPath dotenvExamplePath =
+  Config
+    { configExamplePath = dotenvExamplePath
+    , configOverride    = False
+    , configPath        = dotenvPath
+    }
 
 main :: IO ()
 main = execParser opts >>= dotEnv
@@ -30,21 +44,34 @@ main = execParser opts >>= dotEnv
      <> header "dotenv - loads options from dotenv files" )
 
 config :: Parser Options
-config = Options
-     <$> some (strOption (
-                  long "file"
-                  <> short 'f'
-                  <> metavar "FILE"
-                  <> help "File to read for options" ))
+config =
+  Options
+     <$> argument str (metavar "PROGRAM")
 
-     <*> argument str (metavar "PROGRAM")
+     <*> strOption
+          ( long "env"
+          <> value ".env"
+          <> metavar "\"DOTENV FILE\""
+          <> help "File with the env variables" )
 
-     <*> switch ( long "overload"
-                  <> short 'o'
-                  <> help "Specify this flag to override existing variables" )
+     <*> strOption
+          ( long "env-example"
+          <> value ".env.example"
+          <> metavar "\"DOTENV EXAMPLE\" FILE"
+          <> help "File with all the necesary env variables" )
+
+     <*> switch
+           ( long "overload"
+           <> short 'o'
+           <> help "Specify this flag to override existing variables" )
 
 dotEnv :: MonadIO m => Options -> m ()
-dotEnv opts = liftIO $ do
-  mapM_ (loadFile (overload opts)) (files opts)
-  code <- system (program opts)
+dotEnv Options{..} = liftIO $ do
+  current <- getCurrentDirectory
+
+  let defaultConfig = buildConfig (current </> dotenvFile) (current </> dotenvExampleFile)
+
+  void $ loadFile (defaultConfig { configOverride = override })
+  code <- system program
   exitWith code
+

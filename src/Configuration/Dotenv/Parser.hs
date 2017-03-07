@@ -1,6 +1,6 @@
 -- |
 -- Module      :  Configuration.Dotenv.Parse
--- Copyright   :  © 2015–2016 Stack Builders Inc.
+-- Copyright   :  © 2015–2017 Stack Builders Inc.
 -- License     :  MIT
 --
 -- Maintainer  :  Stack Builders <hackage@stackbuilders.com>
@@ -14,7 +14,7 @@
 
 {-# LANGUAGE CPP #-}
 
-module Configuration.Dotenv.Parse (configParser) where
+module Configuration.Dotenv.Parser (configParser) where
 
 import Control.Applicative
 import Control.Monad
@@ -22,14 +22,16 @@ import Text.Megaparsec
 import Text.Megaparsec.String (Parser)
 import qualified Text.Megaparsec.Lexer as L
 
+import Configuration.Dotenv.Types
+
 -- | Returns a parser for a Dotenv configuration file. Accepts key and value
 -- arguments separated by @=@. Comments in all positions are handled
 -- appropriately.
-configParser :: Parser [(String, String)]
+configParser :: Parser [Variable]
 configParser = between scn eof (sepEndBy1 envLine (eol <* scn))
 
 -- | Parse a single environment variable assignment.
-envLine :: Parser (String, String)
+envLine :: Parser Variable
 envLine = (,) <$> (lexeme variableName <* lexeme (char '=')) <*> lexeme value
 
 -- | Variables must start with a letter or underscore, and may contain
