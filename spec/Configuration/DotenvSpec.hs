@@ -4,6 +4,10 @@ module Configuration.DotenvSpec where
 
 import Control.Monad (void)
 
+#if !MIN_VERSION_base(4,8,0)
+import Control.Applicative ((<$))
+#endif
+
 #if MIN_VERSION_base(4,7,0)
 import System.Environment (setEnv, lookupEnv, unsetEnv)
 #else
