@@ -14,10 +14,13 @@
 
 module Configuration.Dotenv
   ( loadFile
+  , onMissingFile
   ) where
 
 import Control.Monad (liftM)
+import Control.Monad.Catch (MonadCatch, catchIf)
 import Control.Monad.IO.Class
+import System.IO.Error (isDoesNotExistError)
 
 #if MIN_VERSION_base(4,7,0)
 import System.Environment (getEnv, setEnv, lookupEnv)
@@ -64,3 +67,15 @@ setVariable override var@(key, value) =
     case res of
       Nothing   -> liftIO $ setEnv key value >> return var
       Just val' -> return (key, val')
+
+
+-- | The helper allows to avoid exceptions in the case of missing files and
+-- perform some action instead.
+--
+-- @since 0.3.1.0
+
+onMissingFile :: MonadCatch m
+  => m a -- ^ Action to perform that may fail because of missing file
+  -> m a -- ^ Action to perform if file is indeed missing
+  -> m a
+onMissingFile f h = catchIf isDoesNotExistError f (const h)
