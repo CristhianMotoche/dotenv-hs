@@ -12,8 +12,6 @@ import Options.Applicative
 import Control.Monad (void)
 import Control.Monad.IO.Class(MonadIO(..))
 
-import System.FilePath ((</>))
-import System.Directory (getCurrentDirectory)
 import System.Process (system)
 import System.Exit (exitWith)
 
@@ -26,14 +24,6 @@ data Options = Options
   , dotenvExampleFile :: String -- ^ Path for the .env.example file
   , override          :: Bool   -- ^ Override current environment variables
   } deriving (Show)
-
-buildConfig :: FilePath -> FilePath -> Config
-buildConfig dotenvPath dotenvExamplePath =
-  Config
-    { configExamplePath = dotenvExamplePath
-    , configOverride    = False
-    , configPath        = dotenvPath
-    }
 
 main :: IO ()
 main = execParser opts >>= dotEnv
@@ -71,11 +61,13 @@ config =
 
 dotEnv :: MonadIO m => Options -> m ()
 dotEnv Options{..} = liftIO $ do
-  current <- getCurrentDirectory
-
-  let defaultConfig = buildConfig (current </> dotenvFile) (current </> dotenvExampleFile)
-
-  void $ loadFile (defaultConfig { configOverride = override })
+  void $
+    loadFile
+      Config
+        { configExamplePath = dotenvExampleFile
+        , configOverride = override
+        , configPath = dotenvFile
+        }
   code <- system program
   exitWith code
 
