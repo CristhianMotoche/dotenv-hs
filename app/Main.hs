@@ -49,16 +49,20 @@ config =
      <$> argument str (metavar "PROGRAM")
 
      <*> strOption
-          ( long "env"
-          <> value ".env"
-          <> metavar "\"DOTENV FILE\""
-          <> help "File with the env variables" )
+          ( long "dotenv"
+         <> short 'e'
+         <> value ".env"
+         <> showDefault
+         <> metavar "DOTENV"
+         <> help "File with the env variables" )
 
      <*> strOption
-          ( long "env-example"
-          <> value ".env.example"
-          <> metavar "\"DOTENV EXAMPLE\" FILE"
-          <> help "File with all the necesary env variables" )
+          ( long "dotenv-example"
+         <> short 'x'
+         <> value ".env.example"
+         <> showDefault
+         <> metavar "DOTENV_EXAMPLE"
+         <> help "File with all the necesary env variables" )
 
      <*> switch
           ( long "override"
