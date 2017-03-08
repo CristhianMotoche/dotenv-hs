@@ -21,7 +21,7 @@ import Configuration.Dotenv.Types
 
 -- | @parseMaybeFile@ parses a @.env@ file.
 -- If the file does not exist then it returns @Nothing@.
-parseMaybeFile :: MonadIO m => FilePath -> m (Maybe [Variable])
+parseMaybeFile :: MonadIO m => FilePath -> m (Maybe [NameValuePair])
 parseMaybeFile path = liftIO $ do
   exist <- doesFileExist path
   if exist
@@ -30,7 +30,7 @@ parseMaybeFile path = liftIO $ do
 
 -- | @parseFile@ parses a .env.example file.
 -- If the file does not exist then it fails.
-parseFile :: MonadIO m => FilePath -> m [Variable]
+parseFile :: MonadIO m => FilePath -> m [NameValuePair]
 parseFile path = liftIO $ do
   content <- readFile path
   case parse configParser path content of

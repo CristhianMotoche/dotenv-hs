@@ -12,7 +12,7 @@
 module Configuration.Dotenv.Types where
 
 -- | Alias for environment variables (NAME, VALUE).
-type Variable = (String, String)
+type NameValuePair = (String, String)
 
 -- | Configuration Data Types with extra options for executing dotenv.
 data Config = Config

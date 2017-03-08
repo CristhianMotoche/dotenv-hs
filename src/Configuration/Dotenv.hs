@@ -32,33 +32,33 @@ import Configuration.Dotenv.File
 import Configuration.Dotenv.Types
 
 -- | @loadFile@ parses the given dotenv file and checks if the environment are empty or not.
-loadFile :: MonadIO m => Config -> m [Variable]
+loadFile :: MonadIO m => Config -> m [NameValuePair]
 loadFile Config{..} = do
   keys      <- map fst `liftM` parseFile configExamplePath
   maybeVars <- parseMaybeFile configPath
   setupEnvVars configOverride keys maybeVars
 
-setupEnvVars :: MonadIO m => Bool -> [String] -> Maybe [Variable] -> m [Variable]
+setupEnvVars :: MonadIO m => Bool -> [String] -> Maybe [NameValuePair] -> m [NameValuePair]
 setupEnvVars override keys maybeVars =
   case maybeVars of
     Nothing   -> mapM getEnvVariable keys
     Just vars -> setVariables override keys vars
 
-getEnvVariable :: MonadIO m => String -> m Variable
+getEnvVariable :: MonadIO m => String -> m NameValuePair
 getEnvVariable key =
   liftM ((,) key) (liftIO (getEnv key))
 
-setVariables :: MonadIO m => Bool -> [String] -> [Variable] -> m [Variable]
+setVariables :: MonadIO m => Bool -> [String] -> [NameValuePair] -> m [NameValuePair]
 setVariables override keys vars =
   mapM (getVariable vars) keys >>= mapM (setVariable override)
 
-getVariable :: MonadIO m => [Variable] -> String -> m Variable
+getVariable :: MonadIO m => [NameValuePair] -> String -> m NameValuePair
 getVariable vars key =
   case lookup key vars of
     Nothing  -> getEnvVariable key
     Just var -> return (key, var)
 
-setVariable :: MonadIO m => Bool -> Variable -> m Variable
+setVariable :: MonadIO m => Bool -> NameValuePair -> m NameValuePair
 setVariable override var@(key, value) =
   if override then
     liftIO $ setEnv key value >> return var

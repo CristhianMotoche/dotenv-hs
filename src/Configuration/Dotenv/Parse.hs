@@ -27,11 +27,11 @@ import Configuration.Dotenv.Types
 -- | Returns a parser for a Dotenv configuration file. Accepts key and value
 -- arguments separated by @=@. Comments in all positions are handled
 -- appropriately.
-configParser :: Parser [Variable]
+configParser :: Parser [NameValuePair]
 configParser = between scn eof (sepEndBy1 envLine (eol <* scn))
 
 -- | Parse a single environment variable assignment.
-envLine :: Parser Variable
+envLine :: Parser NameValuePair
 envLine = (,) <$> (lexeme variableName <* lexeme (char '=')) <*> lexeme value
 
 -- | Variables must start with a letter or underscore, and may contain
