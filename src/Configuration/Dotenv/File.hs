@@ -16,7 +16,7 @@ import Control.Monad.IO.Class
 import System.Directory
 import Text.Megaparsec
 
-import Configuration.Dotenv.Parser
+import Configuration.Dotenv.Parse
 import Configuration.Dotenv.Types
 
 -- | @parseMaybeFile@ parses a @.env@ file.

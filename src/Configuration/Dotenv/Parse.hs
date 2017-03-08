@@ -14,7 +14,7 @@
 
 {-# LANGUAGE CPP #-}
 
-module Configuration.Dotenv.Parser (configParser) where
+module Configuration.Dotenv.Parse (configParser) where
 
 import Control.Applicative
 import Control.Monad

@@ -75,7 +75,7 @@ executable dotenv
 library
   exposed-modules:      Configuration.Dotenv
                       , Configuration.Dotenv.File
-                      , Configuration.Dotenv.Parser
+                      , Configuration.Dotenv.Parse
                       , Configuration.Dotenv.Text
                       , Configuration.Dotenv.Types
 
@@ -101,7 +101,7 @@ test-suite dotenv-test
   main-is: Spec.hs
   other-modules:         Configuration.DotenvSpec
                        , Configuration.Dotenv.FileSpec
-                       , Configuration.Dotenv.ParserSpec
+                       , Configuration.Dotenv.ParseSpec
                        , Configuration.Dotenv.TextSpec
 
   build-depends:       base >=4.6 && <5.0
