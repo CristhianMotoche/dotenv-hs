@@ -61,9 +61,9 @@ config =
           <> help "File with all the necesary env variables" )
 
      <*> switch
-           ( long "overload"
-           <> short 'o'
-           <> help "Specify this flag to override existing variables" )
+          ( long "override"
+         <> short 'o'
+         <> help "Override existing variables" )
 
 dotEnv :: MonadIO m => Options -> m ()
 dotEnv Options{..} = liftIO $ do
