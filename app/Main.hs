@@ -36,7 +36,7 @@ main = do
     where
       opts = info (helper <*> config)
         ( fullDesc
-       <> progDesc "Runs PROGRAM after loading options from FILE"
+       <> progDesc "Runs PROGRAM after loading options from DOTENV FILE"
        <> header "dotenv - loads options from dotenv files" )
 
 config :: Parser Options
