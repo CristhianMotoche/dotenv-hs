@@ -1,3 +1,14 @@
+## Dotenv 0.4.0.0
+
+* Add `parseFile` and `parseMaybeFile` functions for parsing dotenv files.
+
+* Changed `loadFile` function to get `Config` with the paths for the .env file
+  and the .env.example file. It also allows to override the environment
+  variables with the values defined in the dotenv file.
+
+* Add `Config` type with options for overriding, setting the path for .env and
+  .env.example file.
+
 ## Dotenv 0.3.1.0
 
 * Made interface more polymorphic so the functions works in any instance of
