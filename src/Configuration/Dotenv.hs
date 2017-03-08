@@ -31,7 +31,10 @@ import System.Environment.Compat (getEnv, setEnv, lookupEnv)
 import Configuration.Dotenv.File
 import Configuration.Dotenv.Types
 
--- | @loadFile@ parses the given dotenv file and checks if the environment are empty or not.
+-- | @loadFile@ parses the environment variables defined in the @dotenv example@
+-- file and checks if they are defined in the @dotenv@ file or in the environment.
+-- It also allows to @override@ the environment variables defined in the environment
+-- with the values defined in the dotenv file.
 loadFile :: MonadIO m => Config -> m [NameValuePair]
 loadFile Config{..} = do
   keys      <- map fst `liftM` parseFile configExamplePath
