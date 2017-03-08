@@ -19,6 +19,6 @@ spec = do
 
   describe "parseFile" $
     it "returns parsed variables from file" $
-      parseFile "test/fixtures/.dotenv"
+      parseFile "spec/fixtures/.dotenv"
         `shouldReturn`
           [("DOTENV", "true"), ("UNICODE_TEST", "Manabí")]
