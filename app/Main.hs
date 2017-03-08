@@ -10,7 +10,6 @@ import Data.Monoid ((<>))
 import Options.Applicative
 
 import Control.Monad (void)
-import Control.Monad.IO.Class(MonadIO(..))
 
 import System.Process (system)
 import System.Exit (exitWith)
@@ -26,12 +25,19 @@ data Options = Options
   } deriving (Show)
 
 main :: IO ()
-main = execParser opts >>= dotEnv
-  where
-    opts = info (helper <*> config)
-      ( fullDesc
-     <> progDesc "Runs PROGRAM after loading options from FILE"
-     <> header "dotenv - loads options from dotenv files" )
+main = do
+  Options{..} <- execParser opts
+  void $ loadFile Config
+    { configExamplePath = dotenvExampleFile
+    , configOverride = override
+    , configPath = dotenvFile
+    }
+  system program >>= exitWith
+    where
+      opts = info (helper <*> config)
+        ( fullDesc
+       <> progDesc "Runs PROGRAM after loading options from FILE"
+       <> header "dotenv - loads options from dotenv files" )
 
 config :: Parser Options
 config =
@@ -58,16 +64,4 @@ config =
           ( long "override"
          <> short 'o'
          <> help "Override existing variables" )
-
-dotEnv :: MonadIO m => Options -> m ()
-dotEnv Options{..} = liftIO $ do
-  void $
-    loadFile
-      Config
-        { configExamplePath = dotenvExampleFile
-        , configOverride = override
-        , configPath = dotenvFile
-        }
-  code <- system program
-  exitWith code
 
