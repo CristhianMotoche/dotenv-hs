@@ -38,7 +38,10 @@ maintainer:          hackage@stackbuilders.com
 copyright:           2015-2016 Stack Builders Inc.
 category:            Configuration
 build-type:          Simple
-extra-source-files:    test/fixtures/.dotenv
+extra-source-files:    spec/fixtures/.dotenv
+                     , spec/fixtures/.dotenv.example
+                     , spec/fixtures/.bad.dotenv.example
+                     , spec/fixtures/.incomplete_dotenv
                      , CHANGELOG.md
                      , README.md
 cabal-version:       >=1.10
