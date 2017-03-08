@@ -51,7 +51,7 @@ spec = after_ (mapM_ unsetEnv ["DOTENV", "UNICODE_TEST"]) $ do
 
       context "when the variables are not defined in the dotenv file" $
         it "fails because of missing keys" $ do
-          let config = buildConfig ".dotenv.example" False ".incomplete_dotenv"
+          let config = buildConfig ".dotenv.example" False ".incomplete.dotenv"
           loadFile config `shouldThrow` anyIOException
 
     it "fails when .env.example is missing" $ do

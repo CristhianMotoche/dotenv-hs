@@ -41,7 +41,7 @@ build-type:          Simple
 extra-source-files:    spec/fixtures/.dotenv
                      , spec/fixtures/.dotenv.example
                      , spec/fixtures/.bad.dotenv.example
-                     , spec/fixtures/.incomplete_dotenv
+                     , spec/fixtures/.incomplete.dotenv
                      , CHANGELOG.md
                      , README.md
 cabal-version:       >=1.10
