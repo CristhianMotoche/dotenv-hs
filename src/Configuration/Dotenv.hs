@@ -44,8 +44,8 @@ loadFile Config{..} = do
 setupEnvVars :: MonadIO m => Bool -> [String] -> Maybe [NameValuePair] -> m [NameValuePair]
 setupEnvVars override keys maybeVars =
   case maybeVars of
-    Nothing   -> mapM getEnvVariable keys
     Just vars -> setVariables override keys vars
+    _         -> mapM getEnvVariable keys
 
 getEnvVariable :: MonadIO m => String -> m NameValuePair
 getEnvVariable key =
@@ -58,8 +58,8 @@ setVariables override keys vars =
 getVariable :: MonadIO m => [NameValuePair] -> String -> m NameValuePair
 getVariable vars key =
   case lookup key vars of
-    Nothing  -> getEnvVariable key
     Just var -> return (key, var)
+    _        -> getEnvVariable key
 
 setVariable :: MonadIO m => Bool -> NameValuePair -> m NameValuePair
 setVariable override var@(key, value) =
@@ -68,8 +68,8 @@ setVariable override var@(key, value) =
   else do
     res <- liftIO $ lookupEnv key
     case res of
-      Nothing   -> liftIO $ setEnv key value >> return var
       Just val' -> return (key, val')
+      _         -> liftIO $ setEnv key value >> return var
 
 
 -- | The helper allows to avoid exceptions in the case of missing files and
