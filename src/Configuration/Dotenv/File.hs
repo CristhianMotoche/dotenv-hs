@@ -34,5 +34,5 @@ parseFile :: MonadIO m => FilePath -> m [NameValuePair]
 parseFile path = liftIO $ do
   content <- readFile path
   case parse configParser path content of
-    Left err   -> error $ "Failed to read file" ++ show err
+    Left err   -> error $ parseErrorPretty err
     Right vars -> return vars
