@@ -1,4 +1,4 @@
--- |
+{- |
 -- Module      :  Configuration.Dotenv.Parse
 -- Copyright   :  © 2015–2017 Stack Builders Inc.
 -- License     :  MIT
@@ -11,6 +11,7 @@
 -- with the form key=value. Comments and blank lines are also supported. More
 -- information on the dotenv format can be found in the project README and the
 -- test suite.
+-}
 
 {-# LANGUAGE CPP #-}
 

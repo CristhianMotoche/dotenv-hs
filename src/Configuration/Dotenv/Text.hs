@@ -1,4 +1,4 @@
--- |
+{- |
 -- Module      :  Configuration.Dotenv.Text
 -- Copyright   :  © 2015–2017 Stack Builders Inc.
 -- License     :  MIT
@@ -7,7 +7,8 @@
 -- Stability   :  experimental
 -- Portability :  portable
 --
--- Provides a @Data.Text@ interface for retrieving variables from a dotenv file.
+-- Provides a "Data.Text" interface for retrieving variables from a dotenv file.
+-}
 
 module Configuration.Dotenv.Text (parseFile) where
 

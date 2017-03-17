@@ -1,4 +1,4 @@
--- |
+{- |
 -- Module      :  Configuration.Dotenv.File
 -- Copyright   :  © 2015–2017 Stack Builders Inc.
 -- License     :  MIT
@@ -8,6 +8,7 @@
 -- Portability :  portable
 --
 -- This module provides parsers for dotenv files.
+-}
 
 module Configuration.Dotenv.File where
 
@@ -18,7 +19,7 @@ import Text.Megaparsec
 
 import Configuration.Dotenv.Parse
 
--- | @parseMaybeFile@ parses a @.env@ file.
+-- | @parseMaybeFile@ parses a .env file.
 -- If the file does not exist then it returns @Nothing@.
 parseMaybeFile :: MonadIO m => FilePath -> m (Maybe [(String, String)])
 parseMaybeFile path = liftIO $ do
