@@ -22,16 +22,14 @@ import Text.Megaparsec
 import Text.Megaparsec.String (Parser)
 import qualified Text.Megaparsec.Lexer as L
 
-import Configuration.Dotenv.Types
-
 -- | Returns a parser for a Dotenv configuration file. Accepts key and value
 -- arguments separated by @=@. Comments in all positions are handled
 -- appropriately.
-configParser :: Parser [NameValuePair]
+configParser :: Parser [(String, String)]
 configParser = between scn eof (sepEndBy1 envLine (eol <* scn))
 
 -- | Parse a single environment variable assignment.
-envLine :: Parser NameValuePair
+envLine :: Parser (String, String)
 envLine = (,) <$> (lexeme variableName <* lexeme (char '=')) <*> lexeme value
 
 -- | Variables must start with a letter or underscore, and may contain

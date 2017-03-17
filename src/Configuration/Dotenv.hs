@@ -35,33 +35,33 @@ import Configuration.Dotenv.Types
 -- file and checks if they are defined in the @dotenv@ file or in the environment.
 -- It also allows to @override@ the environment variables defined in the environment
 -- with the values defined in the dotenv file.
-loadFile :: MonadIO m => Config -> m [NameValuePair]
+loadFile :: MonadIO m => Config -> m [(String, String)]
 loadFile Config{..} = do
   keys      <- map fst `liftM` parseFile configExamplePath
   maybeVars <- parseMaybeFile configPath
   setupEnvVars configOverride keys maybeVars
 
-setupEnvVars :: MonadIO m => Bool -> [String] -> Maybe [NameValuePair] -> m [NameValuePair]
+setupEnvVars :: MonadIO m => Bool -> [String] -> Maybe [(String, String)] -> m [(String, String)]
 setupEnvVars override keys maybeVars =
   case maybeVars of
     Just vars -> setVariables override keys vars
     _         -> mapM getEnvVariable keys
 
-getEnvVariable :: MonadIO m => String -> m NameValuePair
+getEnvVariable :: MonadIO m => String -> m (String, String)
 getEnvVariable key =
   liftM ((,) key) (liftIO (getEnv key))
 
-setVariables :: MonadIO m => Bool -> [String] -> [NameValuePair] -> m [NameValuePair]
+setVariables :: MonadIO m => Bool -> [String] -> [(String, String)] -> m [(String, String)]
 setVariables override keys vars =
   mapM (getVariable vars) keys >>= mapM (setVariable override)
 
-getVariable :: MonadIO m => [NameValuePair] -> String -> m NameValuePair
+getVariable :: MonadIO m => [(String, String)] -> String -> m (String, String)
 getVariable vars key =
   case lookup key vars of
     Just var -> return (key, var)
     _        -> getEnvVariable key
 
-setVariable :: MonadIO m => Bool -> NameValuePair -> m NameValuePair
+setVariable :: MonadIO m => Bool -> (String, String) -> m (String, String)
 setVariable override var@(key, value) =
   if override then
     liftIO $ setEnv key value >> return var

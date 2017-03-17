@@ -11,9 +11,6 @@
 
 module Configuration.Dotenv.Types where
 
--- | Alias for environment variables (NAME, VALUE).
-type NameValuePair = (String, String)
-
 -- | Configuration Data Types with extra options for executing dotenv.
 data Config = Config
   { configExamplePath :: FilePath        -- ^ The path for the @.env.example@ file

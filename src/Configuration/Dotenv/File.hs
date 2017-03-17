@@ -17,11 +17,10 @@ import System.Directory
 import Text.Megaparsec
 
 import Configuration.Dotenv.Parse
-import Configuration.Dotenv.Types
 
 -- | @parseMaybeFile@ parses a @.env@ file.
 -- If the file does not exist then it returns @Nothing@.
-parseMaybeFile :: MonadIO m => FilePath -> m (Maybe [NameValuePair])
+parseMaybeFile :: MonadIO m => FilePath -> m (Maybe [(String, String)])
 parseMaybeFile path = liftIO $ do
   exist <- doesFileExist path
   if exist
@@ -30,7 +29,7 @@ parseMaybeFile path = liftIO $ do
 
 -- | @parseFile@ parses a .env.example file.
 -- If the file does not exist then it fails.
-parseFile :: MonadIO m => FilePath -> m [NameValuePair]
+parseFile :: MonadIO m => FilePath -> m [(String, String)]
 parseFile path = liftIO $ do
   content <- readFile path
   case parse configParser path content of
