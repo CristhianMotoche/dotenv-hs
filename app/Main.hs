@@ -58,7 +58,7 @@ config =
          <> value ".env.example"
          <> showDefault
          <> metavar "DOTENV_EXAMPLE"
-         <> help "File with all the necesary env variables" )
+         <> help "File with all the necessary env variables" )
 
      <*> switch
           ( long "override"
